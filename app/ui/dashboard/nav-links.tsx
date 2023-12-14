@@ -3,7 +3,6 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
-  ShoppingBagIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import clsx from "clsx";
@@ -18,7 +17,6 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: "Customers", href: "/dashboard/customers", icon: UserGroupIcon },
-  { name: "product", href: "/dashboard/product", icon: ShoppingBagIcon },
 ];
 
 export default function NavLinks() {

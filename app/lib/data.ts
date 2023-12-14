@@ -7,10 +7,21 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
+  Artwork,
 } from "./definitions";
 import { unstable_noStore as noStore } from "next/cache";
 import { formatCurrency } from "./utils";
-
+export async function fetchProducts() {
+  noStore();
+  try {
+    const prod = await sql<Artwork>`
+    SELECT * FROM products`;
+    return prod.rows;
+  } catch (error) {
+    console.error("Failed to fetch prod:", error);
+    throw new Error("Failed to fetch prod.");
+  }
+}
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
   // This is equivalent to in fetch(..., {cache: 'no-store'}).

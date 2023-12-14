@@ -3,10 +3,52 @@ const {
   invoices,
   customers,
   revenue,
+  products,
   users,
+  p,
 } = require("../app/lib/placeholder-data.js");
 const bcrypt = require("bcrypt");
+const { promise } = require("zod");
 
+async function seedProducts() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  //Create the "products "
+  try {
+    const createTable = await sql`CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      category VARCHAR(255) NOT NULL,
+      medium VARCHAR(255) NOT NULL,
+      subject VARCHAR(255) NOT NULL,
+      price DECIMAL(10, 2) NOT NULL,
+      availability BOOLEAN NOT NULL,
+      image VARCHAR(255) NOT NULL
+    );
+    `;
+    console.log(`create "products" table`);
+
+    const insertedProducts = await Promise.all(
+      products.map(async (product) => {
+        return sql`
+          INSERT INTO products (name, description, category, medium, subject, price, availability, image)
+          VALUES (${product.name}, ${product.description}, ${product.category}, ${product.medium}, ${product.subject}, ${product.price},  ${product.availability}, ${product.image})
+          ON CONFLICT (id) DO NOTHING;
+      `;
+      })
+    );
+
+    console.log(`Seeded ${insertedProducts.length} prod `);
+    console.log(insertedProducts);
+    return {
+      createTable,
+      products: insertedProducts,
+    };
+  } catch (error) {
+    console.error("Error seeding products:", error);
+    throw error;
+  }
+}
 async function seedUsers() {
   try {
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
@@ -114,7 +156,7 @@ async function seedCustomers() {
     );
 
     console.log(`Seeded ${insertedCustomers.length} customers`);
-
+    console.log(insertedCustomers);
     return {
       createTable,
       customers: insertedCustomers,
@@ -165,4 +207,5 @@ async function seedRevenue() {
   await seedCustomers();
   await seedInvoices();
   await seedRevenue();
+  await seedProducts();
 })();
